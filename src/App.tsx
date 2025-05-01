@@ -1,18 +1,22 @@
-
-import './App.css'
-import { Button } from './components/ui/button'
+import { BrowserRouter, Route, Routes } from 'react-router';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import Search from './pages/Search';
+import UploadProduct from './pages/UploadProduct';
+import SeeProduct from './pages/SeeProduct';
 
 function App() {
-
   return (
-    <>
-      <div className='text-blue-500'>water
-      </div>
-
-      <Button>water</Button>
-      
-    </>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path='login' element=<Login /> />
+        <Route path='' element=<Home /> />
+        <Route path='search' element=<Search /> />
+        <Route path='upload-product' element=<UploadProduct /> />
+        <Route path='see-product' element=<SeeProduct /> />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
