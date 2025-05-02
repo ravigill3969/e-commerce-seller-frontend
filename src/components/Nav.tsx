@@ -43,7 +43,7 @@ const Nav = () => {
               Dashboard
             </Link>
             <Link
-              to="/products"
+              to="/see-product"
               className="flex items-center hover:text-blue-200 transition-colors"
             >
               <Package className="w-5 h-5 mr-2" />
