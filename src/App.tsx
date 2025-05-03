@@ -4,6 +4,8 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import UploadProduct from './pages/UploadProduct';
 import SeeProduct from './pages/SeeProduct';
+import Dashboard from './pages/Dashboard';
+// import Dashboard from './pages/Dashboard';
 
 function App() {
   return (
@@ -14,6 +16,7 @@ function App() {
         <Route path='search' element=<Search /> />
         <Route path='upload-product' element=<UploadProduct /> />
         <Route path='see-product' element=<SeeProduct /> />
+        <Route path='dashboard' element=<Dashboard /> />
       </Routes>
     </BrowserRouter>
   );
