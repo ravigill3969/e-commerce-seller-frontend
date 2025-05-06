@@ -1,18 +1,41 @@
-import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
+import { useRegister } from '@/api/auth-client';
+import { GoogleLogin, GoogleOAuthProvider, CredentialResponse } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
+import toast from 'react-hot-toast';
+
+type DecodedCredential = {
+  email: string;
+  name: string;
+  picture: string;
+  sub: string;
+  exp: number;
+  iat: number;
+};
 
 function GoogleOAuth() {
   const clientId = import.meta.env.VITE_CLIENT_ID;
+  const { mutate } = useRegister();
 
-  const handleSuccess = (credentialResponse) => {
-    const userInfo = jwtDecode(credentialResponse.credential);
+  const handleSuccess = (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) {
+      toast.error('No credentials received');
+      return;
+    }
 
-    console.log('User Info:', userInfo);
+    const userInfo = jwtDecode<DecodedCredential>(credentialResponse.credential);
+
+    console.log(userInfo)
+
+    mutate({
+      email: userInfo.email,
+      name: userInfo.name,
+      picture: userInfo.picture,
+    });
   };
 
   return (
     <GoogleOAuthProvider clientId={clientId}>
-      <GoogleLogin onSuccess={handleSuccess} onError={() => console.log('Login Failed')} />
+      <GoogleLogin onSuccess={handleSuccess} onError={() => toast.error('Login failed')} />
     </GoogleOAuthProvider>
   );
 }
