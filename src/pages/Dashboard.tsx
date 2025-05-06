@@ -38,7 +38,7 @@ const COLORS = ['#6366F1', '#10B981', '#F59E0B'];
 
 function Dashboard() {
   return (
-    <div className='p-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3'>
+    <div className='p-6 grid gap-6 md:grid-rows-2 xl:grid-cols-3'>
       {/* Sales Over Time */}
       <Card>
         <CardContent>
