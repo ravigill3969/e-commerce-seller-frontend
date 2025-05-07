@@ -8,8 +8,13 @@ type DataT = {
   picture: string;
 };
 
+type GoogleOAuthResT = {
+  success: boolean;
+  message: string;
+};
+
 export const useGoogleRegister = () => {
-  const register = async (data: DataT) => {
+  const register = async (data: DataT): Promise<GoogleOAuthResT> => {
     const response = await fetch(`${BASE_URL}/seller/auth/google-register`, {
       method: 'POST',
       credentials: 'include',
@@ -31,8 +36,8 @@ export const useGoogleRegister = () => {
   const mutate = useMutation({
     mutationKey: ['register'],
     mutationFn: register,
-    onSuccess: () => {
-      toast.success('Registered successfully!');
+    onSuccess(data) {
+      toast.success(data.message);
     },
     onError: (err) => {
       toast.error(err.message);

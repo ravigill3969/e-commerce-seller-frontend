@@ -14,9 +14,9 @@ function App() {
         <Routes>
           <Route path='login' element=<Login /> />
           <Route path='' element=<Home /> />
-          <Route path='search' element=<Search /> />
+          {/* <Route path='search' element=<Search /> /> */}
           <Route path='upload-product' element=<UploadProduct /> />
-          <Route path='see-product' element=<SeeProduct /> />
+          {/* <Route path='see-product' element=<SeeProduct /> /> */}
           <Route path='dashboard' element=<Dashboard /> />
         </Routes>
       </BrowserRouter>
