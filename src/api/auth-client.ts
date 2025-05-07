@@ -8,9 +8,9 @@ type DataT = {
   picture: string;
 };
 
-export const useRegister = () => {
+export const useGoogleRegister = () => {
   const register = async (data: DataT) => {
-    const response = await fetch(`${BASE_URL}/seller/auth/register`, {
+    const response = await fetch(`${BASE_URL}/seller/auth/google-register`, {
       method: 'POST',
       credentials: 'include',
       headers: {

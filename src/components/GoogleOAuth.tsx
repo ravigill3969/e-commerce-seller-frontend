@@ -1,4 +1,4 @@
-import { useRegister } from '@/api/auth-client';
+import { useGoogleRegister } from '@/api/auth-client';
 import { GoogleLogin, GoogleOAuthProvider, CredentialResponse } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import toast from 'react-hot-toast';
@@ -14,7 +14,7 @@ type DecodedCredential = {
 
 function GoogleOAuth() {
   const clientId = import.meta.env.VITE_CLIENT_ID;
-  const { mutate } = useRegister();
+  const { mutate } = useGoogleRegister();
 
   const handleSuccess = (credentialResponse: CredentialResponse) => {
     if (!credentialResponse.credential) {
@@ -23,8 +23,6 @@ function GoogleOAuth() {
     }
 
     const userInfo = jwtDecode<DecodedCredential>(credentialResponse.credential);
-
-    console.log(userInfo)
 
     mutate({
       email: userInfo.email,
