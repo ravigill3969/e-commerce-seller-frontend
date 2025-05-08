@@ -14,7 +14,7 @@ const UploadProduct = () => {
     productName: '',
     brand: '',
     price: 1,
-    stackQuantity: 1,
+    stockQuantity: 1,
     category: 'electronics',
     mediaUpload: [] as File[],
     description: '',
@@ -149,8 +149,8 @@ const UploadProduct = () => {
                         <Input
                           type='number'
                           placeholder='100'
-                          name='stackQuantity'
-                          value={productInfo.stackQuantity}
+                          name='stockQuantity'
+                          value={productInfo.stockQuantity}
                           onChange={onProductInfoChange}
                           className='pl-8 rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500'
                         />

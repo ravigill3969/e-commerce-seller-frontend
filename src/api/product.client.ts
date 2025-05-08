@@ -7,7 +7,7 @@ type AddProductT = {
   productName: string;
   brand: string;
   price: number;
-  stackQuantity: number;
+  stockQuantity: number;
   category: string;
   mediaUpload: File[];
   description: string;
@@ -25,7 +25,7 @@ export const useAddProduct = () => {
     formData.append('productName', data.productName);
     formData.append('brand', data.brand);
     formData.append('price', data.price.toString());
-    formData.append('stackQuantity', data.stackQuantity.toString());
+    formData.append('stockQuantity', data.stockQuantity.toString());
     formData.append('category', data.category);
     formData.append('description', data.description);
 
