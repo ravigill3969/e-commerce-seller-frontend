@@ -5,13 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { UploadCloud, Package, DollarSign, Hash, Info } from 'lucide-react';
-import { useUser } from '@/Context/UserContext';
 import { useState } from 'react';
 import Nav from '@/components/Nav';
+import { useAddProduct } from '@/api/product.client';
 
 const UploadProduct = () => {
-  // const { isLoggedIn, userId } = useUser();
-
   const [productInfo, setProductInfo] = useState({
     productName: '',
     brand: '',
@@ -21,6 +19,8 @@ const UploadProduct = () => {
     mediaUpload: [] as File[],
     description: '',
   });
+
+  const { mutate } = useAddProduct();
 
   const onProductInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -46,6 +46,11 @@ const UploadProduct = () => {
       ...prev,
       mediaUpload: prev.mediaUpload.filter((_, i) => i !== index),
     }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    mutate(productInfo);
   };
 
   return (
@@ -245,6 +250,7 @@ const UploadProduct = () => {
                 </Button>
                 <Button
                   type='submit'
+                  onClick={handleSubmit}
                   className='bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all'>
                   Publish Product
                 </Button>
