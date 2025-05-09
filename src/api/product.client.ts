@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
@@ -36,7 +36,7 @@ export const useAddProduct = () => {
     const response = await fetch(`${BASE_URL}/seller/product/add-product`, {
       method: 'POST',
       credentials: 'include',
-    
+
       body: formData,
     });
 
@@ -61,4 +61,51 @@ export const useAddProduct = () => {
   });
 
   return mutation;
+};
+
+interface ProductResponse {
+  message: string;
+  success: boolean;
+  products: Product[];
+}
+
+interface Product {
+  _id: string;
+  productName: string;
+  sellerID: string;
+  price: number;
+  stockQuantity: number;
+  category: string;
+  brand: string;
+  description: string;
+  photoURLs: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+}
+
+export const useGetCurrentSellerProducts = () => {
+  const addProduct = async (): Promise<ProductResponse> => {
+    const response = await fetch(`${BASE_URL}/seller/product/get-active-user-products`, {
+      credentials: 'include',
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      throw new Error(res.message || 'Something went wrong!');
+    }
+
+    console.log(res);
+
+    return res;
+  };
+
+  const query = useQuery({
+    queryKey: ['addProduct'],
+    queryFn: addProduct,
+  });
+
+  return query;
 };
