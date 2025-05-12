@@ -1,6 +1,7 @@
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router';
 
 type DataT = {
   email: string;
@@ -14,7 +15,8 @@ type GoogleOAuthResT = {
 };
 
 export const useGoogleRegister = () => {
-  const { invalidateQueries } = useQueryClient();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const register = async (data: DataT): Promise<GoogleOAuthResT> => {
     const response = await fetch(`${BASE_URL}/seller/auth/google-register`, {
       method: 'POST',
@@ -39,7 +41,8 @@ export const useGoogleRegister = () => {
     mutationFn: register,
     onSuccess(data) {
       toast.success(data.message);
-      invalidateQueries({ queryKey: ['verifyUser'] });
+      queryClient.invalidateQueries({ queryKey: ['verifyUser'] });
+      navigate('/');
     },
     onError: (err) => {
       toast.error(err.message);

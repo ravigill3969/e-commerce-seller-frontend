@@ -6,78 +6,79 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { UploadCloud, Package, DollarSign, Hash, Info } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import Nav from '@/components/Nav';
-import { useAddProduct, useGetProductWithId } from '@/api/product.client';
+import { useAddProduct, useEditProduct, useGetProductWithId } from '@/api/product.client';
 import { useParams } from 'react-router';
 
 const UploadProduct = () => {
   const { id } = useParams();
-
   const edit = !!id;
+  const [mediaUpload, setMediaUpload] = useState<File[]>([]);
+  const [mediaReceived, setMediaReceived] = useState<string[]>([]);
 
-  const [productInfo, setProductInfo] = useState({
-    productName: '',
-    brand: '',
-    price: 1,
-    stockQuantity: 1,
-    category: 'electronics',
-    mediaUpload: [] as File[],
-    mediaReceived: [] as string[],
-    description: '',
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      productName: '',
+      brand: '',
+      price: 1,
+      stockQuantity: 1,
+      category: 'electronics',
+      description: '',
+    },
   });
 
-  const { data } = useGetProductWithId({ id });
+  const { data } = useGetProductWithId(id);
   const { mutate } = useAddProduct();
-
-  console.log(data);
+  const { mutate: editMutate } = useEditProduct(id);
 
   useEffect(() => {
     if (edit && data) {
       const use = data.product;
 
-      setProductInfo({
+      reset({
         productName: use.productName || '',
         brand: use.brand || '',
         price: isNaN(Number(use.price)) ? 1 : Number(use.price),
         stockQuantity: isNaN(Number(use.stockQuantity)) ? 1 : Number(use.stockQuantity),
-
         category: use.category || 'electronics',
-        mediaReceived: use.photoURLs,
         description: use.description || '',
-        mediaUpload: [],
       });
+
+      setMediaReceived(use.photoURLs || []);
     }
-  }, [edit, data, id]);
-
-  const onProductInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-
-    setProductInfo((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  }, [data, id, reset]);
 
   const onImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-      setProductInfo((prev) => ({
-        ...prev,
-        mediaUpload: [...prev.mediaUpload, ...filesArray],
-      }));
+      setMediaUpload((prev) => [...prev, ...filesArray]);
     }
   };
 
-  const removeImage = (index: number) => {
-    setProductInfo((prev) => ({
-      ...prev,
-      mediaUpload: prev.mediaUpload.filter((_, i) => i !== index),
-    }));
+  const removeImage = (index: number, type: 'upload' | 'received') => {
+    if (type === 'upload') {
+      setMediaUpload((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      setMediaReceived((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = (formData: any) => {
+    const productInfo = {
+      ...formData,
+      mediaUpload,
+    };
     mutate(productInfo);
+  };
+
+  const onUpdate = (formData: any) => {
+    const productInfo = {
+      ...formData,
+      mediaUpload,
+      mediaReceived,
+    };
+    editMutate(productInfo);
   };
 
   return (
@@ -102,7 +103,7 @@ const UploadProduct = () => {
               </div>
             </CardHeader>
 
-            <form>
+            <form onSubmit={handleSubmit(edit ? onUpdate : onSubmit)}>
               <CardContent className='space-y-8 pt-8'>
                 {/* Product Information Section */}
                 <div className='space-y-6'>
@@ -114,33 +115,33 @@ const UploadProduct = () => {
                   <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
                     <div className='space-y-2'>
                       <Label className='text-sm font-medium text-gray-700'>Product Name</Label>
-                      <Input
-                        placeholder='Premium Leather Jacket'
+                      <Controller
                         name='productName'
-                        value={productInfo.productName}
-                        onChange={onProductInfoChange}
-                        className='rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            placeholder='Premium Leather Jacket'
+                            className='rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                          />
+                        )}
                       />
                     </div>
 
                     <div className='space-y-2'>
                       <Label className='text-sm font-medium text-gray-700'>Brand</Label>
-                      <Input
-                        placeholder='Luxury Brands Inc.'
+                      <Controller
                         name='brand'
-                        value={productInfo.brand}
-                        onChange={onProductInfoChange}
-                        className='rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500'
+                        control={control}
+                        render={({ field }) => (
+                          <Input
+                            {...field}
+                            placeholder='Luxury Brands Inc.'
+                            className='rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500'
+                          />
+                        )}
                       />
                     </div>
-
-                    {/* <div className='space-y-2'>
-                    <Label className='text-sm font-medium text-gray-700'>Product ID</Label>
-                    <Input
-                      placeholder='SKU-123456'
-                      className='rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500'
-                    />
-                  </div> */}
                   </div>
                 </div>
 
@@ -156,13 +157,17 @@ const UploadProduct = () => {
                       <Label className='text-sm font-medium text-gray-700'>Price</Label>
                       <div className='relative'>
                         <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'>$</span>
-                        <Input
-                          type='number'
-                          placeholder='0.00'
+                        <Controller
                           name='price'
-                          value={productInfo.price}
-                          onChange={onProductInfoChange}
-                          className='pl-8 rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500'
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              type='number'
+                              placeholder='0.00'
+                              className='pl-8 rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500'
+                            />
+                          )}
                         />
                       </div>
                     </div>
@@ -173,33 +178,40 @@ const UploadProduct = () => {
                         <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'>
                           <Hash className='w-4 h-4' />
                         </span>
-                        <Input
-                          type='number'
-                          placeholder='100'
+                        <Controller
                           name='stockQuantity'
-                          value={productInfo.stockQuantity}
-                          onChange={onProductInfoChange}
-                          className='pl-8 rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500'
+                          control={control}
+                          render={({ field }) => (
+                            <Input
+                              {...field}
+                              type='number'
+                              placeholder='100'
+                              className='pl-8 rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500'
+                            />
+                          )}
                         />
                       </div>
                     </div>
 
                     <div className='space-y-2'>
                       <Label className='text-sm font-medium text-gray-700'>Category</Label>
-                      <Select
+                      <Controller
                         name='category'
-                        value={productInfo.category}
-                        onValueChange={(value) => setProductInfo((prev) => ({ ...prev, category: value }))}>
-                        <SelectTrigger className='rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500'>
-                          <SelectValue placeholder='Select category' />
-                        </SelectTrigger>
-                        <SelectContent className='rounded-lg shadow-lg'>
-                          <SelectItem value='electronics'>Electronics</SelectItem>
-                          <SelectItem value='fashion'>Fashion</SelectItem>
-                          <SelectItem value='home'>Home & Living</SelectItem>
-                          <SelectItem value='beauty'>Beauty</SelectItem>
-                        </SelectContent>
-                      </Select>
+                        control={control}
+                        render={({ field }) => (
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger className='rounded-lg border-gray-300 focus:ring-2 focus:ring-green-500'>
+                              <SelectValue placeholder='Select category' />
+                            </SelectTrigger>
+                            <SelectContent className='rounded-lg shadow-lg'>
+                              <SelectItem value='electronics'>Electronics</SelectItem>
+                              <SelectItem value='fashion'>Fashion</SelectItem>
+                              <SelectItem value='home'>Home & Living</SelectItem>
+                              <SelectItem value='beauty'>Beauty</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
+                      />
                     </div>
                   </div>
                 </div>
@@ -209,9 +221,9 @@ const UploadProduct = () => {
                     <UploadCloud className='w-5 h-5 text-purple-500' />
                     Media Upload
                   </h3>
-                  {productInfo.mediaUpload.length > 0 && (
+                  {mediaUpload.length > 0 && (
                     <div className='mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-                      {productInfo.mediaUpload.map((file, index) => (
+                      {mediaUpload.map((file, index) => (
                         <div key={index} className='relative group'>
                           <img
                             src={URL.createObjectURL(file)}
@@ -221,7 +233,7 @@ const UploadProduct = () => {
 
                           <Button
                             type='button'
-                            onClick={() => removeImage(index)}
+                            onClick={() => removeImage(index, 'upload')}
                             className='absolute top-2 right-2 bg-white/80 text-gray-600 hover:text-red-500 hover:bg-white rounded-full p-1 shadow transition'>
                             ×
                           </Button>
@@ -229,11 +241,10 @@ const UploadProduct = () => {
                       ))}
                     </div>
                   )}
-                  {productInfo?.mediaReceived?.length > 0 && (
+                  {mediaReceived.length > 0 && (
                     <div className='mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-                      {productInfo.mediaReceived.map((file, index) => (
+                      {mediaReceived.map((file, index) => (
                         <div key={index} className='relative group'>
-                          {/* Image Preview */}
                           <img
                             src={file}
                             alt={`preview-${index}`}
@@ -242,7 +253,7 @@ const UploadProduct = () => {
 
                           <Button
                             type='button'
-                            onClick={() => removeImage(index)}
+                            onClick={() => removeImage(index, 'received')}
                             className='absolute top-2 right-2 bg-white/80 text-gray-600 hover:text-red-500 hover:bg-white rounded-full p-1 shadow transition'>
                             ×
                           </Button>
@@ -277,27 +288,30 @@ const UploadProduct = () => {
 
                   <div className='space-y-2'>
                     <Label className='text-sm font-medium text-gray-700'>Description</Label>
-                    <Textarea
-                      placeholder='Describe your product in detail...'
-                      rows={5}
+                    <Controller
                       name='description'
-                      value={productInfo.description}
-                      onChange={onProductInfoChange}
-                      className='rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500'
+                      control={control}
+                      render={({ field }) => (
+                        <Textarea
+                          {...field}
+                          placeholder='Describe your product in detail...'
+                          rows={5}
+                          className='rounded-lg border-gray-300 focus:ring-2 focus:ring-blue-500'
+                        />
+                      )}
                     />
                   </div>
                 </div>
               </CardContent>
 
               <CardFooter className='flex justify-end gap-4 p-8 border-t border-gray-200'>
-                <Button variant='outline' className='rounded-lg px-6 py-3'>
+                <Button variant='outline' className='rounded-lg px-6 py-3' type='button'>
                   Cancel
                 </Button>
                 <Button
                   type='submit'
-                  onClick={handleSubmit}
                   className='bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg px-8 py-3 shadow-lg hover:shadow-xl transition-all'>
-                  Publish Product
+                  {!edit ? 'Publish' : 'Update '}Product
                 </Button>
               </CardFooter>
             </form>

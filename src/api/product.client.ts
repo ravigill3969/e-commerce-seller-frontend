@@ -11,6 +11,7 @@ type AddProductT = {
   category: string;
   mediaUpload: File[];
   description: string;
+  mediaReceived: string[];
 };
 
 type AddProductResT = {
@@ -116,11 +117,7 @@ interface SingleProductResponseT {
   product: Product;
 }
 
-type GetProductWithIdT = {
-  id?: string;
-};
-
-export const useGetProductWithId = ({id}: GetProductWithIdT) => {
+export const useGetProductWithId = (id?: string) => {
   const getProduct = async (): Promise<SingleProductResponseT> => {
     const response = await fetch(`${BASE_URL}/seller/product/get-product-with-id/${id}`, {
       credentials: 'include',
@@ -132,15 +129,64 @@ export const useGetProductWithId = ({id}: GetProductWithIdT) => {
       throw new Error(res.message || 'Something went wrong!');
     }
 
-
     return res;
   };
 
   const query = useQuery({
-    queryKey: ['getProduct'],
+    queryKey: ['getProduct', id],
     queryFn: getProduct,
     enabled: !!id,
+    refetchOnWindowFocus: false,
   });
 
   return query;
+};
+
+export const useEditProduct = (id?: string) => {
+  const addProduct = async (data: AddProductT): Promise<AddProductResT> => {
+    const formData = new FormData();
+
+    formData.append('productName', data.productName);
+    formData.append('brand', data.brand);
+    formData.append('price', data.price.toString());
+    formData.append('stockQuantity', data.stockQuantity.toString());
+    formData.append('category', data.category);
+    formData.append('description', data.description);
+
+    data.mediaUpload.map((img) => {
+      formData.append('image', img);
+    });
+
+    data.mediaReceived.map((img) => {
+      formData.append('mediaReceived', img);
+    });
+
+    const response = await fetch(`${BASE_URL}/seller/product/edit-product/${id}`, {
+      method: 'PUT',
+      credentials: 'include',
+
+      body: formData,
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      throw new Error(res.message || 'Something went wrong!');
+    }
+
+    return res;
+  };
+
+  const mutation = useMutation({
+    mutationKey: ['editProduct'],
+    mutationFn: addProduct,
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+
+  return mutation;
 };
