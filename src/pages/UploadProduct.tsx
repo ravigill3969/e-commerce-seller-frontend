@@ -29,7 +29,7 @@ const UploadProduct = () => {
   const { data } = useGetProductWithId({ id });
   const { mutate } = useAddProduct();
 
-  console.log(data)
+  console.log(data);
 
   useEffect(() => {
     if (edit && data) {
@@ -204,7 +204,6 @@ const UploadProduct = () => {
                   </div>
                 </div>
 
-                {/* Media Upload Section */}
                 <div className='space-y-6'>
                   <h3 className='text-lg font-semibold flex items-center gap-2 text-gray-700'>
                     <UploadCloud className='w-5 h-5 text-purple-500' />
@@ -214,14 +213,33 @@ const UploadProduct = () => {
                     <div className='mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
                       {productInfo.mediaUpload.map((file, index) => (
                         <div key={index} className='relative group'>
-                          {/* Image Preview */}
                           <img
                             src={URL.createObjectURL(file)}
                             alt={`preview-${index}`}
                             className='w-full h-32 object-cover rounded-xl border border-gray-300 shadow'
                           />
 
-                          {/* Cross Button */}
+                          <Button
+                            type='button'
+                            onClick={() => removeImage(index)}
+                            className='absolute top-2 right-2 bg-white/80 text-gray-600 hover:text-red-500 hover:bg-white rounded-full p-1 shadow transition'>
+                            ×
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {productInfo?.mediaReceived?.length > 0 && (
+                    <div className='mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
+                      {productInfo.mediaReceived.map((file, index) => (
+                        <div key={index} className='relative group'>
+                          {/* Image Preview */}
+                          <img
+                            src={file}
+                            alt={`preview-${index}`}
+                            className='w-full h-32 object-cover rounded-xl border border-gray-300 shadow'
+                          />
+
                           <Button
                             type='button'
                             onClick={() => removeImage(index)}
