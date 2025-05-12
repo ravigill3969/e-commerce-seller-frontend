@@ -17,6 +17,7 @@ function App() {
           <Route path='upload-product' element=<UploadProduct /> />
           <Route path='see-product' element=<SeeProduct /> />
           <Route path='dashboard' element=<Dashboard /> />
+          <Route path='/edit-product/:id' element=<UploadProduct /> />
         </Routes>
       </BrowserRouter>
       <Toaster />

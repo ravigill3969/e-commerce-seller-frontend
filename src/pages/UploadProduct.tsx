@@ -5,11 +5,16 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { UploadCloud, Package, DollarSign, Hash, Info } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Nav from '@/components/Nav';
-import { useAddProduct } from '@/api/product.client';
+import { useAddProduct, useGetProductWithId } from '@/api/product.client';
+import { useParams } from 'react-router';
 
 const UploadProduct = () => {
+  const { id } = useParams();
+
+  const edit = !!id;
+
   const [productInfo, setProductInfo] = useState({
     productName: '',
     brand: '',
@@ -17,10 +22,32 @@ const UploadProduct = () => {
     stockQuantity: 1,
     category: 'electronics',
     mediaUpload: [] as File[],
+    mediaReceived: [] as string[],
     description: '',
   });
 
+  const { data } = useGetProductWithId({ id });
   const { mutate } = useAddProduct();
+
+  console.log(data)
+
+  useEffect(() => {
+    if (edit && data) {
+      const use = data.product;
+
+      setProductInfo({
+        productName: use.productName || '',
+        brand: use.brand || '',
+        price: isNaN(Number(use.price)) ? 1 : Number(use.price),
+        stockQuantity: isNaN(Number(use.stockQuantity)) ? 1 : Number(use.stockQuantity),
+
+        category: use.category || 'electronics',
+        mediaReceived: use.photoURLs,
+        description: use.description || '',
+        mediaUpload: [],
+      });
+    }
+  }, [edit, data, id]);
 
   const onProductInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

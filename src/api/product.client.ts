@@ -103,8 +103,43 @@ export const useGetCurrentSellerProducts = () => {
   };
 
   const query = useQuery({
-    queryKey: ['addProduct'],
+    queryKey: ['getProducts'],
     queryFn: addProduct,
+  });
+
+  return query;
+};
+
+interface SingleProductResponseT {
+  message: string;
+  success: boolean;
+  product: Product;
+}
+
+type GetProductWithIdT = {
+  id?: string;
+};
+
+export const useGetProductWithId = ({id}: GetProductWithIdT) => {
+  const getProduct = async (): Promise<SingleProductResponseT> => {
+    const response = await fetch(`${BASE_URL}/seller/product/get-product-with-id/${id}`, {
+      credentials: 'include',
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      throw new Error(res.message || 'Something went wrong!');
+    }
+
+
+    return res;
+  };
+
+  const query = useQuery({
+    queryKey: ['getProduct'],
+    queryFn: getProduct,
+    enabled: !!id,
   });
 
   return query;

@@ -57,12 +57,10 @@ const ProductManagement = () => {
   const [animateIn, setAnimateIn] = useState(false);
   const [activeCategories, setActiveCategories] = useState<string[]>([]);
 
-  // Format price to always show 2 decimal places
   const formatPrice = (price: number): string => {
     return parseFloat(price.toString()).toFixed(2);
   };
 
-  // Function to get stock status color
   const getStockStatusColor = (quantity: number): StockStatus => {
     if (quantity <= 0) return 'destructive';
     if (quantity < 5) return 'secondary';
@@ -70,7 +68,6 @@ const ProductManagement = () => {
     return 'outline';
   };
 
-  // Function to get stock status text
   const getStockStatusText = (quantity: number): string => {
     if (quantity <= 0) return 'Out of stock';
     if (quantity < 5) return 'Low stock';
@@ -78,32 +75,20 @@ const ProductManagement = () => {
     return 'In stock';
   };
 
-  // Function to determine image to show
-  const getProductImage = (product: Product): string => {
-    if (product.photoURLs && product.photoURLs.length > 0) {
-      return product.photoURLs[0];
-    }
-    return '/api/placeholder/300/300';
-  };
-
   useEffect(() => {
-    // Trigger animation after component mounts
     setAnimateIn(true);
 
-    // Extract unique categories from products for filter
     if (data?.products) {
       const categories = [...new Set(data.products.map((product: Product) => product.category))];
       setActiveCategories(categories);
     }
   }, [data]);
 
-  // Filter and sort products
   const getFilteredProducts = () => {
     if (!data?.products) return [];
 
     let filtered = [...data.products];
 
-    // Apply search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (product) =>
@@ -113,7 +98,6 @@ const ProductManagement = () => {
       );
     }
 
-    // Apply category filter
     if (filterCategory !== 'all') {
       filtered = filtered.filter((product) => product.category === filterCategory);
     }
@@ -131,7 +115,6 @@ const ProductManagement = () => {
       }
     }
 
-    // Apply sorting
     if (sortBy === 'newest') {
       filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } else if (sortBy === 'oldest') {
@@ -239,9 +222,9 @@ const ProductManagement = () => {
           style={{ transitionDelay: `${index * 50}ms` }}>
           <div className='relative h-60 overflow-hidden bg-gray-100'>
             <img
-              src={getProductImage(product)}
+              src={product.photoURLs[0]}
               alt={product.productName}
-              className='w-full h-full object-cover transition-transform duration-700 group-hover:scale-105'
+              className='w-full h-full p-4 object-cover transition-transform duration-700 group-hover:scale-105'
             />
             <div className='absolute top-0 right-0 p-3'>
               {!product.isActive && (
@@ -332,7 +315,7 @@ const ProductManagement = () => {
                   <div className='flex items-center gap-3'>
                     <div className='h-14 w-14 flex-shrink-0 rounded-md bg-gray-100 overflow-hidden shadow-sm'>
                       <img
-                        src={getProductImage(product)}
+                        // src={getProductImage(product)}
                         alt={product.productName}
                         className='h-full w-full object-cover'
                       />
