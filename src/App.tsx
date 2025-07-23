@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 import Login from './pages/Login';
-import Home from './pages/Home';
 import UploadProduct from './pages/UploadProduct';
 import SeeProduct from './pages/SeeProduct';
 import Dashboard from './pages/Dashboard';
@@ -12,10 +11,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='login' element=<Login /> />
-          <Route path='' element=<Home /> />
+          {/* <Route path='' element=<Home /> /> */}
           {/* <Route path='search' element=<Search /> /> */}
           <Route path='upload-product' element=<UploadProduct /> />
-          <Route path='see-product' element=<SeeProduct /> />
+          <Route path='' element=<SeeProduct /> />
           <Route path='dashboard' element=<Dashboard /> />
           <Route path='/edit-product/:id' element=<UploadProduct /> />
         </Routes>
