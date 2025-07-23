@@ -9,9 +9,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {   LogOut, Menu } from 'lucide-react';
+import { LogOut } from 'lucide-react';
+import { useLogout } from '@/api/auth-client';
 
 const Nav = () => {
+  const { mutate } = useLogout();
   return (
     <nav className='bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-white shadow-2xl border-b border-white/10'>
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -78,7 +80,9 @@ const Nav = () => {
                   </Link> */}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className='text-red-600 hover:bg-red-50 cursor-pointer font-medium'>
+                <DropdownMenuItem
+                  onClick={() => mutate}
+                  className='text-red-600 hover:bg-red-50 cursor-pointer font-medium'>
                   <LogOut className='w-4 h-4 mr-2' />
                   Logout
                 </DropdownMenuItem>
@@ -86,7 +90,6 @@ const Nav = () => {
             </DropdownMenu>
 
             {/* Mobile menu button */}
-            
           </div>
         </div>
       </div>

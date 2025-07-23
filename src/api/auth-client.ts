@@ -51,3 +51,36 @@ export const useGoogleRegister = () => {
 
   return mutate;
 };
+
+export const useLogout = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const logout = async (): Promise<GoogleOAuthResT> => {
+    const response = await fetch(`${BASE_URL}/seller/auth/logout`, {
+      method: 'GET',
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      throw new Error(res.message || 'Something went wrong!');
+    }
+
+    return res;
+  };
+
+  const mutate = useMutation({
+    mutationKey: ['logout'],
+    mutationFn: logout,
+    onSuccess(data) {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ['verifyUser'] });
+      navigate('/login');
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  return mutate;
+};
