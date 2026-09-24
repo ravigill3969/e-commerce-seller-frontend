@@ -190,3 +190,34 @@ export const useEditProduct = (id?: string) => {
 
   return mutation;
 };
+
+export const useDeleteProduct = () => {
+  const deleteProduct = async (id: string): Promise<AddProductResT> => {
+
+    const response = await fetch(`${BASE_URL}/seller/product/delete-product/${id}`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      throw new Error(res.message || 'Something went wrong!');
+    }
+
+    return res;
+  };
+
+  const mutation = useMutation({
+    mutationKey: ['deleteProduct'],
+    mutationFn: deleteProduct,
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
+    onError(error) {
+      toast.error(error.message);
+    },
+  });
+
+  return mutation;
+};

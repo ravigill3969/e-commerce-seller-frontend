@@ -7,6 +7,12 @@ type DataT = {
   email: string;
   name: string;
   picture: string;
+  password: string;
+};
+
+type DataLoginT = {
+  email: string;
+  password: string;
 };
 
 type GoogleOAuthResT = {
@@ -14,43 +20,43 @@ type GoogleOAuthResT = {
   message: string;
 };
 
-export const useGoogleRegister = () => {
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
-  const register = async (data: DataT): Promise<GoogleOAuthResT> => {
-    const response = await fetch(`${BASE_URL}/seller/auth/google-register`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
+// export const useGoogleRegister = () => {
+//   const navigate = useNavigate();
+//   const queryClient = useQueryClient();
+//   const register = async (data: DataT): Promise<GoogleOAuthResT> => {
+//     const response = await fetch(`${BASE_URL}/seller/auth/google-register`, {
+//       method: 'POST',
+//       credentials: 'include',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(data),
+//     });
 
-    const res = await response.json();
+//     const res = await response.json();
 
-    if (!response.ok) {
-      throw new Error(res.message || 'Something went wrong!');
-    }
+//     if (!response.ok) {
+//       throw new Error(res.message || 'Something went wrong!');
+//     }
 
-    return res;
-  };
+//     return res;
+//   };
 
-  const mutate = useMutation({
-    mutationKey: ['register'],
-    mutationFn: register,
-    onSuccess(data) {
-      toast.success(data.message);
-      queryClient.invalidateQueries({ queryKey: ['verifyUser'] });
-      navigate('/');
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+//   const mutate = useMutation({
+//     mutationKey: ['register'],
+//     mutationFn: register,
+//     onSuccess(data) {
+//       toast.success(data.message);
+//       queryClient.invalidateQueries({ queryKey: ['verifyUser'] });
+//       navigate('/');
+//     },
+//     onError: (err) => {
+//       toast.error(err.message);
+//     },
+//   });
 
-  return mutate;
-};
+//   return mutate;
+// };
 
 export const useLogout = () => {
   const navigate = useNavigate();
@@ -76,6 +82,83 @@ export const useLogout = () => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ['verifyUser'] });
       navigate('/login');
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  return mutate;
+};
+
+export const useRegister = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const register = async (data: DataT): Promise<GoogleOAuthResT> => {
+    const response = await fetch(`${BASE_URL}/seller/auth/register`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      throw new Error(res.message || 'Something went wrong!');
+    }
+
+    return res;
+  };
+
+  const mutate = useMutation({
+    mutationKey: ['register'],
+    mutationFn: register,
+    async onSuccess(data) {
+      toast.success(data.message);
+      await queryClient.refetchQueries({ queryKey: ['verifyUser'] });
+      navigate('/');
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
+  return mutate;
+};
+
+export const useLogin = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const login = async (data: DataLoginT): Promise<GoogleOAuthResT> => {
+    const response = await fetch(`${BASE_URL}/seller/auth/login`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    const res = await response.json();
+
+    if (!response.ok) {
+      throw new Error(res.message || 'Something went wrong!');
+    }
+
+    return res;
+  };
+
+  const mutate = useMutation({
+    mutationKey: ['login'],
+    mutationFn: login,
+    async onSuccess(data) {
+      toast.success(data.message);
+      await queryClient.refetchQueries({ queryKey: ['verifyUser'] });
+      navigate('/');
     },
     onError: (err) => {
       toast.error(err.message);
